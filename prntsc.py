@@ -19,8 +19,8 @@ while not done:
         else:
             amount = int(amount)
 
-            # About 1.2 images per second
-            timeToScrape = amount / 1.2
+            # About 1.1 images per second
+            timeToScrape = amount / 1.1
             timeUnit = "seconds"
             if timeToScrape > 60:
                 timeToScrape = timeToScrape / 60
@@ -44,12 +44,15 @@ headers = {
 
 chars = "a b c d e f g h j i k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9".split()
 
+codeList = []
+
 i = 1
 while i <= amount:
     code = ""
     for j in range(6):
         code += random.choice(chars)
-    if code[0] != "0":        
+    if code[0] != "0" and code not in codeList:
+        codeList.append(code)
         try:
             print(f"[#{i}] Trying code '{code}'...")
             pageURL = f"https://prnt.sc/{code}"
@@ -68,7 +71,12 @@ while i <= amount:
             i += 1
         
         except urllib.error.HTTPError:
-            print(f"HTTP Error with code '{code}'")
+            print(f"[!] HTTP Error with code '{code}'")
 
         except:
-            print(f"Error with code '{code}'")
+            print(f"[!] Error with code '{code}'")
+    else:
+        print(f"[!] Error: code '{code}' has already been saved")
+        i += 1
+
+input(f"\n{amount} images were gathered. Press escape to close program.")
