@@ -2,6 +2,12 @@ import urllib.request
 import urllib.error
 import random
 import os
+from datetime import datetime
+from numberFormatter import formatNum
+from sys import argv
+
+def timeInSecs(x):
+    return (x.hour * 3600) + (x.minute * 60) + (x.second)
 
 outputFolder = "output" # change if there is already a folder called output which is important
 
@@ -10,33 +16,37 @@ if not os.path.exists(outputFolder):
 
 print("prnt.sc image scraper")
 
-done = False
-while not done:
-    try:
-        amount = int(input("\nHow many pictures do you want? "))
-        if amount < 2:
-            print("Amount of pictures needs to be at least 2\n")
-        else:
-            amount = int(amount)
+if len(argv) == 1:
+    done = False
+    while not done:
+        try:
+            amount = int(input("\nHow many pictures do you want? "))
+            if amount < 1:
+                print("Amount of images must be at least 1.")
+            else:
+                # About 1.1 images per second
+                timeToScrape = amount / 1.1
+                timeUnit = "seconds"
+                if timeToScrape > 60:
+                    timeToScrape = timeToScrape / 60
+                    timeUnit = "minutes"
+                if timeToScrape > 60:
+                    timeToScrape = timeToScrape / 60
+                    timeUnit = "hours"
 
-            # About 1.1 images per second
-            timeToScrape = amount / 1.1
-            timeUnit = "seconds"
-            if timeToScrape > 60:
-                timeToScrape = timeToScrape / 60
-                timeUnit = "minutes"
-            if timeToScrape > 60:
-                timeToScrape = timeToScrape / 60
-                timeUnit = "hours"
+                print(f"It will take about {round(timeToScrape, 2)} {timeUnit} to gather {amount} images.")
+                
+                action = input("Continue? (y/n) ").lower()
+                if action in ("yes", "y"):
+                    done = True
+        
+        except ValueError:
+            print("Please enter a number\n")       
 
-            print(f"It will take about {round(timeToScrape, 2)} {timeUnit} to gather {amount} images.")
-            
-            action = input("Continue? (y/n) ").lower()
-            if action in ("yes", "y"):
-                done = True
-    
-    except ValueError:
-        print("Please enter a number\n")       
+else:
+    amount = int(argv[1])
+
+startTime = datetime.now().time()
 
 headers = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
@@ -54,7 +64,7 @@ while i <= amount:
     if code[0] != "0" and code not in codeList:
         codeList.append(code)
         try:
-            print(f"[#{i}] Trying code '{code}'...")
+            print(f"[#{formatNum(i, 'lz', len(str(amount)) - len(str(i)))}] Trying code '{code}'...")
             pageURL = f"https://prnt.sc/{code}"
             pageRequest = urllib.request.Request(url=pageURL, headers=headers)
             pageContent = str(urllib.request.urlopen(pageRequest).read())
@@ -75,8 +85,21 @@ while i <= amount:
 
         except:
             print(f"[!] Error with code '{code}'")
-    else:
+            
+    elif code in codeList:
         print(f"[!] Error: code '{code}' has already been saved")
         i += 1
 
-input(f"\n{amount} images were gathered. Press escape to close program.")
+endTime = datetime.now().time()
+timeDiff = timeInSecs(endTime) - timeInSecs(startTime)
+timeDiffUnit = "seconds"
+
+if timeDiff > 60:
+    timeDiff = timeDiff / 60
+    timeDiffUnit = "minutes"
+    
+if timeDiff > 60:
+    timeDiff = timeDiff / 60
+    timeDiffUnit = "hours"
+    
+input(f"\n{amount} images were gathered in about {round(timeDiff, 2)} {timeDiffUnit}. Press 'Enter' to close program.")
