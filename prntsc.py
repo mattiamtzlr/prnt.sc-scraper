@@ -16,48 +16,48 @@ if not os.path.exists(outputFolder):
 
 print("prnt.sc image scraper")
 
-if len(argv) == 1:
-    done = False
-    while not done:
-        try:
+done = False
+while not done:
+    try:
+        if len(argv) == 1:
             amount = int(input("\nHow many pictures do you want? "))
-            if amount < 1:
+        else:
+            amount = int(argv[1])
+
+        if amount < 1:
                 print("Amount of images must be at least 1.")
-            else:
-                try:
-                    with open("timings.txt") as f:
-                        averageTime = f.read()
+        else:
+            try:
+                with open("timings.txt") as f:
+                    averageTime = f.read()
 
-                    averageTime = float(averageTime)
-                
-                except FileNotFoundError:
-                    averageTime = 1.1 # default, about 1.1 images per second
-                
-                except ValueError:
-                    print("Warning: File 'timings.txt' is corrupted, deleting file...\n")
-                    os.remove("timings.txt")
-                    averageTime = 1.1
+                averageTime = float(averageTime)
+            
+            except FileNotFoundError:
+                averageTime = 1.1 # default, about 1.1 images per second
+            
+            except ValueError:
+                print("Warning: File 'timings.txt' is corrupted, deleting file...\n")
+                os.remove("timings.txt")
+                averageTime = 1.1
 
-                timeToScrape = amount / averageTime
-                timeUnit = "seconds"
-                if timeToScrape > 60:
-                    timeToScrape = timeToScrape / 60
-                    timeUnit = "minutes"
-                if timeToScrape > 60:
-                    timeToScrape = timeToScrape / 60
-                    timeUnit = "hours"
+            timeToScrape = amount / averageTime
+            timeUnit = "seconds"
+            if timeToScrape > 60:
+                timeToScrape = timeToScrape / 60
+                timeUnit = "minutes"
+            if timeToScrape > 60:
+                timeToScrape = timeToScrape / 60
+                timeUnit = "hours"
 
-                print(f"It will take about {round(timeToScrape, 2)} {timeUnit} to gather {amount} images.")
-                
-                action = input("Continue? (y/n) ").lower()
-                if action in ("yes", "y"):
-                    done = True
-        
-        except ValueError:
-            print("Please enter a number\n")       
-
-else:
-    amount = int(argv[1])
+            print(f"It will take about {round(timeToScrape, 2)} {timeUnit} to gather {amount} images.")
+            
+            action = input("Continue? (y/n) ").lower()
+            if action in ("yes", "y"):
+                done = True
+    
+    except ValueError:
+        print("Please enter a number\n")
 
 startTime = datetime.now().time()
 
@@ -107,7 +107,7 @@ endTime = datetime.now().time()
 timeDiff = timeInSecs(endTime) - timeInSecs(startTime)
 
 with open("timings.txt", "w") as f:
-    f.write(str(amount / timeDiff))
+    f.write(str((averageTime + (amount / timeDiff)) / 2))
 
 timeDiffUnit = "seconds"
 
