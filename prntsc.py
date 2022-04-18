@@ -24,8 +24,21 @@ if len(argv) == 1:
             if amount < 1:
                 print("Amount of images must be at least 1.")
             else:
-                # About 1.1 images per second
-                timeToScrape = amount / 1.1
+                try:
+                    with open("timings.txt") as f:
+                        averageTime = f.read()
+
+                    averageTime = float(averageTime)
+                
+                except FileNotFoundError:
+                    averageTime = 1.1 # default, about 1.1 images per second
+                
+                except ValueError:
+                    print("Warning: File 'timings.txt' is corrupted, deleting file...\n")
+                    os.remove("timings.txt")
+                    averageTime = 1.1
+
+                timeToScrape = amount / averageTime
                 timeUnit = "seconds"
                 if timeToScrape > 60:
                     timeToScrape = timeToScrape / 60
@@ -92,6 +105,10 @@ while i <= amount:
 
 endTime = datetime.now().time()
 timeDiff = timeInSecs(endTime) - timeInSecs(startTime)
+
+with open("timings.txt", "w") as f:
+    f.write(str(amount / timeDiff))
+
 timeDiffUnit = "seconds"
 
 if timeDiff > 60:
