@@ -4,6 +4,7 @@ import random
 import os
 from datetime import datetime
 from numberFormatter import formatNum
+from timeConverter import convertTime
 from sys import argv
 
 def timeInSecs(x):
@@ -42,15 +43,8 @@ while not done:
                 averageTime = 1.1
 
             timeToScrape = amount / averageTime
-            timeUnit = "seconds"
-            if timeToScrape > 60:
-                timeToScrape = timeToScrape / 60
-                timeUnit = "minutes"
-            if timeToScrape > 60:
-                timeToScrape = timeToScrape / 60
-                timeUnit = "hours"
 
-            print(f"It will take about {round(timeToScrape, 2)} {timeUnit} to gather {amount} images.")
+            print(f"It will take about {convertTime(timeToScrape)} to gather {amount} images.")
             
             action = input("Continue? (y/n) ").lower()
             if action in ("yes", "y"):
@@ -62,7 +56,7 @@ while not done:
 startTime = datetime.now().time()
 
 headers = {
-    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0"
 }
 
 chars = "a b c d e f g h j i k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9".split()
@@ -108,15 +102,5 @@ timeDiff = timeInSecs(endTime) - timeInSecs(startTime)
 
 with open("timings.txt", "w") as f:
     f.write(str((averageTime + (amount / timeDiff)) / 2))
-
-timeDiffUnit = "seconds"
-
-if timeDiff > 60:
-    timeDiff = timeDiff / 60
-    timeDiffUnit = "minutes"
     
-if timeDiff > 60:
-    timeDiff = timeDiff / 60
-    timeDiffUnit = "hours"
-    
-input(f"\n{amount} images were gathered in about {round(timeDiff, 2)} {timeDiffUnit}. Press 'Enter' to close program.")
+input(f"\n{amount} images were gathered in about {convertTime(timeDiff)}. Press 'Enter' to close program.")
