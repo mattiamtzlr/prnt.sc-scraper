@@ -24,34 +24,35 @@ while not done:
             amount = int(input("\nHow many pictures do you want? "))
         else:
             amount = int(argv[1])
-
-        if amount < 1:
-                print("Amount of images must be at least 1.")
-        else:
-            try:
-                with open("timings.txt") as f:
-                    averageTime = f.read()
-
-                averageTime = float(averageTime)
-            
-            except FileNotFoundError:
-                averageTime = 1.1 # default, about 1.1 images per second
-            
-            except ValueError:
-                print("Warning: File 'timings.txt' is corrupted, deleting file...\n")
-                os.remove("timings.txt")
-                averageTime = 1.1
-
-            timeToScrape = amount / averageTime
-
-            print(f"It will take about {convertTime(timeToScrape)} to gather {amount} images.")
-            
-            action = input("Continue? (y/n) ").lower()
-            if action in ("yes", "y"):
-                done = True
     
     except ValueError:
         print("Please enter a number\n")
+        exit(-1)
+
+    if amount < 1:
+            print("Amount of images must be at least 1.")
+    else:
+        try:
+            with open("timings.txt") as f:
+                averageTime = f.read()
+
+            averageTime = float(averageTime)
+        
+        except FileNotFoundError:
+            averageTime = 1.1 # default, about 1.1 images per second
+        
+        except ValueError:
+            print("Warning: File 'timings.txt' is corrupted, deleting file...\n")
+            os.remove("timings.txt")
+            averageTime = 1.1
+
+        timeToScrape = amount / averageTime
+
+        print(f"It will take about {convertTime(timeToScrape)} to gather {amount} images.")
+        
+        action = input("Continue? (y/n) ").lower()
+        if action in ("yes", "y"):
+            done = True
 
 startTime = datetime.now().time()
 
